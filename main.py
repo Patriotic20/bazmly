@@ -1,23 +1,22 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from app.core.exceptions import AppException
 
-from app.modules.menu_item.router import router as menu_item_router
-from app.modules.order.router import router as order_router
-from app.modules.order_item.router import router as order_item_router
-from app.modules.reservation.router import router as reservation_router
-from app.modules.restaurant.router import router as restaurant_router
-from app.modules.review.router import router as review_router
-from app.modules.user.router import router as user_router
-from app.modules.venue_image.router import router as venue_image_router
 
 app = FastAPI(title="Bazmly")
 
-PREFIX = "/api/v1"
 
-app.include_router(user_router, prefix=PREFIX)
-app.include_router(restaurant_router, prefix=PREFIX)
-app.include_router(menu_item_router, prefix=PREFIX)
-app.include_router(order_router, prefix=PREFIX)
-app.include_router(order_item_router, prefix=PREFIX)
-app.include_router(reservation_router, prefix=PREFIX)
-app.include_router(review_router, prefix=PREFIX)
-app.include_router(venue_image_router, prefix=PREFIX)
+@app.exception_handler(AppException)
+async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail, "code": exc.code},
+    )
+
+
+from app.modules.routers import router
+app.include_router(router)
+
+
+
+

@@ -1,10 +1,10 @@
 import uuid
 
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository.base import BaseRepository
 from app.core.schemas.base import PaginatedResponse
+from app.modules.venue_image.exceptions import VenueImageNotFoundError
 from app.modules.venue_image.model import VenueImage
 from app.modules.venue_image.schemas import VenueImageCreate, VenueImageUpdate
 
@@ -26,8 +26,8 @@ class VenueImageService:
 
     async def get_by_id(self, id: uuid.UUID) -> VenueImage:
         obj = await self.repo.get_by_id(id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="VenueImage not found")
+        if obj is None:
+            raise VenueImageNotFoundError()
         return obj
 
     async def create(self, data: VenueImageCreate) -> VenueImage:

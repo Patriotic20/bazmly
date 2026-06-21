@@ -1,11 +1,12 @@
 import uuid
 
 import bcrypt
-from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository.base import BaseRepository
 from app.core.schemas.base import PaginatedResponse
+from app.modules.user.exceptions import UserAlreadyExistsError, UserNotFoundError
 from app.modules.user.model import User
 from app.modules.user.schemas import UserCreate
 
@@ -27,13 +28,16 @@ class UserService:
 
     async def get_by_id(self, id: uuid.UUID) -> User:
         obj = await self.repo.get_by_id(id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="User not found")
+        if obj is None:
+            raise UserNotFoundError()
         return obj
 
     async def create(self, data: UserCreate) -> User:
         hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()
-        return await self.repo.create(username=data.username, password=hashed)
+        try:
+            return await self.repo.create(username=data.username, password=hashed)
+        except IntegrityError:
+            raise UserAlreadyExistsError()
 
     async def delete(self, id: uuid.UUID) -> None:
         obj = await self.get_by_id(id)

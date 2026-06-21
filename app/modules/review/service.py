@@ -1,10 +1,11 @@
 import uuid
 
-from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository.base import BaseRepository
 from app.core.schemas.base import PaginatedResponse
+from app.modules.review.exceptions import ReviewAlreadyExistsError, ReviewNotFoundError
 from app.modules.review.model import Review
 from app.modules.review.schemas import ReviewCreate, ReviewUpdate
 
@@ -26,12 +27,15 @@ class ReviewService:
 
     async def get_by_id(self, id: uuid.UUID) -> Review:
         obj = await self.repo.get_by_id(id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="Review not found")
+        if obj is None:
+            raise ReviewNotFoundError()
         return obj
 
     async def create(self, data: ReviewCreate) -> Review:
-        return await self.repo.create(**data.model_dump())
+        try:
+            return await self.repo.create(**data.model_dump())
+        except IntegrityError:
+            raise ReviewAlreadyExistsError()
 
     async def update(self, id: uuid.UUID, data: ReviewUpdate) -> Review:
         obj = await self.get_by_id(id)

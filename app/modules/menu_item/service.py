@@ -1,10 +1,10 @@
 import uuid
 
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository.base import BaseRepository
 from app.core.schemas.base import PaginatedResponse
+from app.modules.menu_item.exceptions import MenuItemNotFoundError
 from app.modules.menu_item.model import MenuItem
 from app.modules.menu_item.schemas import MenuItemCreate, MenuItemUpdate
 
@@ -26,8 +26,8 @@ class MenuItemService:
 
     async def get_by_id(self, id: uuid.UUID) -> MenuItem:
         obj = await self.repo.get_by_id(id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="MenuItem not found")
+        if obj is None:
+            raise MenuItemNotFoundError()
         return obj
 
     async def create(self, data: MenuItemCreate) -> MenuItem:

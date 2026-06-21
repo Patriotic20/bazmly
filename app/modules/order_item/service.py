@@ -1,10 +1,10 @@
 import uuid
 
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository.base import BaseRepository
 from app.core.schemas.base import PaginatedResponse
+from app.modules.order_item.exceptions import OrderItemNotFoundError
 from app.modules.order_item.model import OrderItem
 from app.modules.order_item.schemas import OrderItemCreate, OrderItemUpdate
 
@@ -26,8 +26,8 @@ class OrderItemService:
 
     async def get_by_id(self, id: uuid.UUID) -> OrderItem:
         obj = await self.repo.get_by_id(id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="OrderItem not found")
+        if obj is None:
+            raise OrderItemNotFoundError()
         return obj
 
     async def create(self, data: OrderItemCreate) -> OrderItem:

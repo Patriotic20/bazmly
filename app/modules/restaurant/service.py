@@ -1,10 +1,10 @@
 import uuid
 
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository.base import BaseRepository
 from app.core.schemas.base import PaginatedResponse
+from app.modules.restaurant.exceptions import RestaurantNotFoundError
 from app.modules.restaurant.model import Restaurant
 from app.modules.restaurant.schemas import RestaurantCreate, RestaurantUpdate
 
@@ -26,8 +26,8 @@ class RestaurantService:
 
     async def get_by_id(self, id: uuid.UUID) -> Restaurant:
         obj = await self.repo.get_by_id(id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="Restaurant not found")
+        if obj is None:
+            raise RestaurantNotFoundError()
         return obj
 
     async def create(self, data: RestaurantCreate) -> Restaurant:

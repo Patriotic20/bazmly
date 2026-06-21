@@ -16,6 +16,7 @@ from app.modules.restaurant.model import Restaurant
 from app.modules.review.model import Review
 from app.modules.user.model import User
 from app.modules.venue_image.model import VenueImage
+from app.modules.auth.verification_model import EmailVerification
 
 config = context.config
 

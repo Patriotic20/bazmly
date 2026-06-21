@@ -22,6 +22,11 @@ class JWTConfig(BaseModel):
     expire_minutes: int = 60
 
 
+class ResendConfig(BaseModel):
+    api_key: str
+    from_email: str = "onboarding@resend.dev"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",
@@ -32,6 +37,7 @@ class Settings(BaseSettings):
     database: DatabaseConfig
     google: GoogleConfig
     jwt: JWTConfig
+    resend: ResendConfig
 
 
 settings = Settings()

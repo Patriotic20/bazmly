@@ -15,4 +15,5 @@ dependencies = [
     "authlib>=1.7.2",
     "httpx>=0.28.1",
     "python-jose[cryptography]>=3.5.0",
+    "resend>=2.32.2",
 ]

@@ -18,3 +18,21 @@ class ConflictError(AppException):
     status_code = 409
     default_detail = "Conflict"
     default_code = "conflict"
+
+
+class BadRequestError(AppException):
+    status_code = 400
+    default_detail = "Bad request"
+    default_code = "bad_request"
+
+
+class ForbiddenError(AppException):
+    status_code = 403
+    default_detail = "Forbidden"
+    default_code = "forbidden"
+
+
+class UnauthorizedError(AppException):
+    status_code = 401
+    default_detail = "Unauthorized"
+    default_code = "unauthorized"

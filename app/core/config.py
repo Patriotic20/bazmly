@@ -10,6 +10,18 @@ class DatabaseConfig(BaseModel):
     max_overflow: int = 10
 
 
+class GoogleConfig(BaseModel):
+    client_id: str
+    client_secret: str
+    redirect_uri: str
+
+
+class JWTConfig(BaseModel):
+    secret_key: str
+    algorithm: str = "HS256"
+    expire_minutes: int = 60
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",
@@ -18,6 +30,8 @@ class Settings(BaseSettings):
     )
 
     database: DatabaseConfig
+    google: GoogleConfig
+    jwt: JWTConfig
 
 
 settings = Settings()

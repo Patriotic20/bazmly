@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.modules.auth.router import router as auth_router
 from app.modules.menu_item.router import router as menu_item_router
 from app.modules.order.router import router as order_router
 from app.modules.order_item.router import router as order_item_router
@@ -14,6 +15,7 @@ PREFIX = "/api/v1"
 
 router = APIRouter()
 
+router.include_router(auth_router, prefix=PREFIX)
 router.include_router(user_router, prefix=PREFIX)
 router.include_router(restaurant_router, prefix=PREFIX)
 router.include_router(menu_item_router, prefix=PREFIX)

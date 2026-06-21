@@ -1,0 +1,40 @@
+import uuid
+
+import bcrypt
+from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.repository.base import BaseRepository
+from app.core.schemas.base import PaginatedResponse
+from app.modules.user.model import User
+from app.modules.user.schemas import UserCreate
+
+
+class UserService:
+    def __init__(self, session: AsyncSession) -> None:
+        self.repo = BaseRepository(User, session)
+
+    async def get_all(self, page: int, size: int) -> PaginatedResponse:
+        items = await self.repo.get_all(limit=size, offset=(page - 1) * size)
+        total = await self.repo.count()
+        return PaginatedResponse(
+            items=items,
+            total=total,
+            page=page,
+            size=size,
+            total_pages=(total + size - 1) // size,
+        )
+
+    async def get_by_id(self, id: uuid.UUID) -> User:
+        obj = await self.repo.get_by_id(id)
+        if not obj:
+            raise HTTPException(status_code=404, detail="User not found")
+        return obj
+
+    async def create(self, data: UserCreate) -> User:
+        hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()
+        return await self.repo.create(username=data.username, password=hashed)
+
+    async def delete(self, id: uuid.UUID) -> None:
+        obj = await self.get_by_id(id)
+        await self.repo.delete(obj)
